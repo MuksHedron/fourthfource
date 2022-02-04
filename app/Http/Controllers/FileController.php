@@ -179,6 +179,14 @@ class FileController extends Controller
 
         return $users;
     }
+	 public function fieldusers_vendor($location,$vendor_id)
+    {
+        $users = UserLoc::join('usersrole', 'userloc.usersid', '=', 'usersrole.usersid')
+            ->whereIn('usersrole.roleid', [7])
+            ->where('userloc.locationid', $location)->get();
+
+        return $users;
+    }
 
 
     public function processorusers($clientid)
@@ -613,7 +621,8 @@ class FileController extends Controller
 
         $file = File::find($fileid);
 
-
+		if(Auth::user()->vendorid == "0" || Auth::user()->vendorid == "")
+		{
         if ($file->filestatusid == 47 || $file->filestatusid == 51) {
             $users = $this->fieldusers($file->locationid);
         } else if ($file->filestatusid == 61 || $file->filestatusid == 62 || $file->filestatusid == 64) {
@@ -621,11 +630,23 @@ class FileController extends Controller
         } else {
             $users = $this->qcusers($file->clientid);
         }
-
+		}else {
+			$users = $this->fieldusers_vendor($file->locationid,Auth::user()->vendorid);			
+		}
+		
+		
+		if(Auth::user()->vendorid == "0" || Auth::user()->vendorid == "")
+		{
         return view('files.assignfile')->with([
             'users' => $users,
             'file' => $file,
         ]);
+		}else {
+			return view('files.vendor_assignfile')->with([
+            'users' => $users,
+            'file' => $file,
+        ]);
+		}
     }
 
     public function updateassignfile(Request $request)

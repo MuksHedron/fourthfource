@@ -58,10 +58,19 @@ class HomeController extends Controller
             $files = (new FileController)->indexUserFilter($auth_user_id, $status, $q);
         }
 
-
-        return view('home')->with([
-            'files' => $files,
-            'role' => $role,
-        ]);
+		if(Auth::user()->vendorid == "0" || Auth::user()->vendorid == "")
+		{
+		return view('home')->with([
+		'files' => $files,
+		'role' => $role,
+		]);
+		}else {
+			
+		return view('vendor_home')->with([
+			'files' => $files,
+			'role' => $role
+		]);	
+		}
+        
     }
 }
